@@ -39,8 +39,6 @@ public class Menu {
         Cliente cliente = new Cliente();
 
         cliente.conectaComServidor();
-
-
     }
 
     private void iniciaModoServidor() throws IOException{

@@ -22,6 +22,7 @@ public class Cliente {
     void conectaComServidor() throws UnknownHostException, IOException{
         Socket socket = new Socket(InetAddress.getLocalHost(), 6262);
 
+        // Esse while não ta funfando direito, tem que estudar como faz
         while(socket.getInetAddress().isReachable(500)){
             System.out.print("conectado -\r");
             System.out.print("conectado /\r");

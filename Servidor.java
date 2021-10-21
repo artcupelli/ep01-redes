@@ -25,22 +25,32 @@ public class Servidor {
             InetAddress enderecoIPdoCliente = socketConexao.getInetAddress();
 
             this.adicionaCliente(enderecoIPdoCliente);
+
+            // TODO: Escutando os comandos 
+
+            // TODO: Verifica se cliente ta on (sem prioridade)
         }
     }
 
     void adicionaCliente(InetAddress enderecoIP) {
+        this.numeroClientesAtivos++;
+
         int idCliente = (int) (Math.random()*10);
 
         Cliente cliente = new Cliente(idCliente, enderecoIP);
 
         this.clientesAtivos.put(idCliente, cliente);
 
-        System.out.println("CLIENTES CONECTADOS "+ System.currentTimeMillis());
-            
+        System.out.println("CLIENTES CONECTADOS "+ this.numeroClientesAtivos);
+    
         this.clientesAtivos.forEach((id, cli) -> System.out.println(id + " | " + cli.getIPAdress()));
         
         System.out.println("\n");
 
-
     }
+
+    boolean verificaSeClienteTaOn(){
+        return true;
+    }
+    
 }
