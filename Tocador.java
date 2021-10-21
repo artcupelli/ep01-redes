@@ -1,3 +1,4 @@
+import java.util.*;
 import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -19,7 +20,7 @@ public class Tocador {
                 audioInput = AudioSystem.getAudioInputStream(caminhoMusica);
                 clip = AudioSystem.getClip();
                 clip.open(audioInput);
-                clip.start();
+                while(true)clip.start();
             }else{
                 System.out.println("Poxa, não encontramos a música :(");
             }
