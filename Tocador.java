@@ -1,27 +1,44 @@
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
 
 public class Tocador {
 
+    AudioInputStream audioInput;
+    Clip clip;
+    long clipPosicaoPausa;
+
     void tocaMusica(String caminho){
-        InputStream musica;
 
         try{
-            musica = new FileInputStream(new File(caminho));
-            AudioStream audio = new AudioStream(musica);
-            AudioPlayer.player.start(audio);
+            File caminhoMusica = new File(caminho);
+            
+            if(caminhoMusica.exists()){
+                audioInput = AudioSystem.getAudioInputStream(caminhoMusica);
+                clip = AudioSystem.getClip();
+                clip.open(audioInput);
+                clip.start();
+            }else{
+                System.out.println("Poxa, não encontramos a música :(");
+            }
         }catch(Exception e){
-            JOptionPane.showMessageDialog(null, "Poxa, deu erro."); 
+            e.printStackTrace();
         }
+
     }
 
-    void pausaMusica(){}
+    void pausaMusica(){
+        clipPosicaoPausa = clip.getMicrosecondPosition();
+        clip.stop();
+    }
+    
+    void voltaMusica(){
+        clip.setMicrosecondPosition(clipPosicaoPausa);
+        clip.start();
+    }
     
     void trocaMusica(){}
-
     
 }
