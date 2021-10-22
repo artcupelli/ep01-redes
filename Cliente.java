@@ -19,8 +19,9 @@ public class Cliente {
 
     public Cliente(){};
     
-    void conectaComServidor() throws UnknownHostException, IOException{
-        Socket socket = new Socket(InetAddress.getLocalHost(), 6262);
+    public void conectaComServidor() throws UnknownHostException, IOException{
+        Socket socket = new Socket(InetAddress.getLocalHost(), 6264);
+        Menu menu = new Menu();
 
         // Esse while não ta funfando direito, tem que estudar como faz
         while(socket.getInetAddress().isReachable(500)){
@@ -28,11 +29,12 @@ public class Cliente {
             System.out.print("conectado /\r");
             System.out.print("conectado |\r");
             System.out.print("conectado \\\r");
+            menu.menuComandos();
         }
 
     }
 
-    InetAddress getIPAdress(){
+    public InetAddress getIPAdress(){
         return this.enderecoIP;
     }
 }

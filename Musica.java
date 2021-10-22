@@ -5,7 +5,7 @@ public class Musica {
     private int numero;
     
     public Musica(String nome, String caminho, int numero){
-        this.nome = nome;
+        this.nome = nome.replace(".wav","");
 		this.caminho = caminho;
 		this.numero = numero;
     }
