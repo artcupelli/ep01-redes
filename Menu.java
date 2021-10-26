@@ -35,14 +35,14 @@ public class Menu {
     private void showComandos(){
         System.out.println("COMANDOS: ");
         System.out.println("---------------");
-        System.out.println("  play:                 Reproduz a música");
-        System.out.println("  pause:                Pausa a música");
-        System.out.println("  add <num>:            Adiciona música correpondente ao número no final da lista de reprodução");
-        System.out.println("  remove <num>:         Remove a primeira incidência da música correpondente ao número no lista de reprodução");
-        System.out.println("  removeInd <index>:    Remove uma música correpondente ao índice em uma posição específica");
-        System.out.println("  musicas:              Mostra a lista de músicas disponíveis");
-        System.out.println("  fila:                 Mostra fila de reprodução");
-        System.out.println("  limpaFila:           Limpa a fila de reprodução");
+        System.out.println("  play:                 Reproduz a musica");
+        System.out.println("  pause:                Pausa a musica");
+        System.out.println("  add <num>:            Adiciona musica correpondente ao numero no final da lista de reproducao");
+        System.out.println("  remove <num>:         Remove a primeira incidencia da musica correpondente ao numero no lista de reproducao");
+        System.out.println("  removeInd <index>:    Remove uma musica correpondente ao indice em uma posicao especifica");
+        System.out.println("  musicas:              Mostra a lista de musicas disponiveis");
+        System.out.println("  fila:                 Mostra fila de reproducao");
+        System.out.println("  limpaFila:            Limpa a fila de reproducao");
         System.out.println("  comandos:             Mostra os comandos");
         System.out.println("  sair:                 Logout do servidor");
         System.out.println();
@@ -75,10 +75,10 @@ public class Menu {
                         break;
                 case "comandos": showComandos();               
                     break;
-                case "sair": System.out.println(" NÃO HÁ SAÍDAAA HEHEHE\n");//desconecta o usuário;                 
+                case "sair": System.out.println(" NAO HA SAIDAAA HEHEHE\n");//desconecta o usuário;                 
                     break;
             
-                default: {System.out.println("\nCOMANDO INVÁLIDO, ESCOLHA ENTRE ESSES:\n"); showComandos();}
+                default: {System.out.println("\nCOMANDO INVALIDO, ESCOLHA ENTRE ESSES:\n"); showComandos();}
                     break;
             }
         }

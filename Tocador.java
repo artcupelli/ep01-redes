@@ -22,6 +22,7 @@ public class Tocador {
             
             if(caminhoMusica.exists()){
                 audioInput = AudioSystem.getAudioInputStream(caminhoMusica);
+                
 
                 AudioFormat format = audioInput.getFormat();
 
@@ -45,7 +46,7 @@ public class Tocador {
 
     }
 
-    void pausaMusica(){
+    /* void pausaMusica(){
         clipPosicaoPausa = clip.getMicrosecondPosition();
         clip.stop();
     }
@@ -53,14 +54,14 @@ public class Tocador {
     void voltaMusica(){
         clip.setMicrosecondPosition(clipPosicaoPausa);
         clip.start();
-    }
+    } */
     
     void trocaMusica(){}
 
     public static void main(String[] args) throws Exception{
         Tocador tocador = new Tocador();
 
-        tocador.tocaMusica("[caminhodamusica].wav");
+        tocador.tocaMusica("./musicas/Taca a Xereca pra Mim - Mc Kaique da Vp.wav");
 
         tocador.pausaMusica();
     }
