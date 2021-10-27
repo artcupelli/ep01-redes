@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -32,56 +33,59 @@ public class Menu {
         }
     }
 
-    private void showComandos(){
-        System.out.println("COMANDOS: ");
-        System.out.println("---------------");
-        System.out.println("  play:                 Reproduz a musica");
-        System.out.println("  pause:                Pausa a musica");
-        System.out.println("  add <num>:            Adiciona musica correpondente ao numero no final da lista de reproducao");
-        System.out.println("  remove <num>:         Remove a primeira incidencia da musica correpondente ao numero no lista de reproducao");
-        System.out.println("  removeInd <index>:    Remove uma musica correpondente ao indice em uma posicao especifica");
-        System.out.println("  musicas:              Mostra a lista de musicas disponiveis");
-        System.out.println("  fila:                 Mostra fila de reproducao");
-        System.out.println("  limpaFila:            Limpa a fila de reproducao");
-        System.out.println("  comandos:             Mostra os comandos");
-        System.out.println("  sair:                 Logout do servidor");
-        System.out.println();
-        
+    private void showComandos(PrintWriter output){
+        output.println("COMANDOS: ");
+        output.println("---------------");
+        output.println("  play:                 Reproduz a música");
+        output.println("  pause:                Pausa a música");
+        output.println("  add <num>:            Adiciona música correpondente ao número no final da lista de reprodução");
+        output.println("  remove <num>:         Remove a primeira incidência da música correpondente ao número no lista de reprodução");
+        output.println("  removeInd <index>:    Remove uma música correpondente ao índice em uma posição específica");
+        output.println("  musicas:              Mostra a lista de músicas disponíveis");
+        output.println("  fila:                 Mostra fila de reprodução");
+        output.println("  limpaFila:            Limpa a fila de reprodução");
+        output.println("  comandos:             Mostra os comandos");
+        output.println("  sair:                 Logout do servidor");
+        output.println(); 
     }
 
-    public void menuComandos(){
+    public void menuComandos(String entrada, Fila fila, PrintWriter output){
         // System.out.println("Sei lá, manda um comando ai:");
-        Scanner scanner = new Scanner(System.in);
-        Fila fila = new Fila();
+        // Scanner scanner = new Scanner(System.in);
+        // Fila fila = new Fila();
+        String [] scanner = entrada.split(" ");
         Tocador toc = new Tocador();
-        showComandos();
-        while(true){
-            switch (scanner.next()) {
+        // String retorno;
+        // showComandos(output);
+        // while(true){
+            switch (scanner[0]) {
                 case "play":  toc.tocaMusica(fila.getFila().getFirst().getCaminho());/* System.out.println(" VAI PA ONDE?\n") */; // play nas músicas
                     break;
-                case "pause": toc.pausaMusica();//System.out.println(" TRAVA NA POSEEEEEEEEEEEE UUUUUUUUUUOUUUUU\n Chama no zoom\n Da um close\n"); // pause nas músicas
+                // case "pause": toc.pausaMusica();//System.out.println(" TRAVA NA POSEEEEEEEEEEEE UUUUUUUUUUOUUUUU\n Chama no zoom\n Da um close\n"); // pause nas músicas
+                //     break;
+                case "add": fila.adicionaMusica(output, Integer.parseInt(scanner[1]));                 
                     break;
-                case "add": fila.adicionaMusica(scanner.nextInt());                 
+                case "remove": fila.removeMusica(output, Integer.parseInt(scanner[1]));                 
                     break;
-                case "remove": fila.removeMusica(scanner.nextInt());                 
+                case "removeInd": fila.removeMusicaIndex(output, Integer.parseInt(scanner[1]));                 
                     break;
-                case "removeInd": fila.removeMusicaIndex(scanner.nextInt());                 
+                case "musicas": fila.mostraMusicas(output);                 
                     break;
-                case "musicas": fila.mostraMusicas();                 
+                case "fila": fila.mostraFila(output);                 
                     break;
-                case "fila": fila.mostraFila();                 
-                    break;
-                case "limpaFila": fila.limparFila();               
+                case "limpaFila": fila.limparFila(output);               
                         break;
-                case "comandos": showComandos();               
+                case "comandos": showComandos(output);               
                     break;
-                case "sair": System.out.println(" NAO HA SAIDAAA HEHEHE\n");//desconecta o usuário;                 
+                case "sair": output.println("NÃO HÁ SAÍDAAA HEHEHE\n");//desconecta o usuário;                 
                     break;
             
-                default: {System.out.println("\nCOMANDO INVALIDO, ESCOLHA ENTRE ESSES:\n"); showComandos();}
+                default: { output.println("\nCOMANDO INVÁLIDO, ESCOLHA ENTRE ESSES:\n"); showComandos(output);}
                     break;
             }
-        }
+
+            // return retorno;
+        // }
     }
 
     private void iniciaModoCliente() throws UnknownHostException, IOException{
