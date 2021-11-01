@@ -70,7 +70,7 @@ public class Fila {
             Iterator<Musica> it = this.fila.iterator();
             int i = 1;
             for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("LISTA DE REPRODUCAO - " + this.fila.size() + ":");
+                sT.remetenteDeDados.println("\nLISTA DE REPRODUCAO - " + this.fila.size() + ":");
             while (it.hasNext()) {
                 Musica aux = it.next();
                 for (ServerCommandThread sT : leitoresDeComando)
