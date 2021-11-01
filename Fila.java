@@ -1,129 +1,194 @@
 import java.util.*;
 import java.io.*;
 
+/**
+ * Cria a fila de musicas para reproducao e guarda as musicas disponiveis
+ */
 public class Fila {
 
-    // Todas as musicas
-    private Map<Integer, Musica> musicasDisponiveis;
-    // Fila para a reproducao
-    private LinkedList<Musica> fila;
-    private ArrayList<ServerThread> threadList;
+    private Map<Integer, Musica> musicasDisponiveis; // Todas as musicas
+    private LinkedList<Musica> fila; // Fila para a reproducao
+    private ArrayList<ServerCommandThread> leitoresDeComando; // Lista das threads do receptor de comando para cada user
 
-    public Fila(ArrayList<ServerThread> threadList){
+    public Fila(ArrayList<ServerCommandThread> leitoresDeComando) {
 
         this.musicasDisponiveis = new HashMap<Integer, Musica>();
         this.fila = new LinkedList<Musica>();
-        this.threadList = threadList;
+        this.leitoresDeComando = leitoresDeComando;
 
-        File[] caminhoArq = new File("./musicas").listFiles();
-        int j=1;
+        // Cadastra as musicas da pasta './musicas' nas musicas disponiveis
+        this.cadastraMusicasDisponiveis();
 
-        // Adiciona musicas na lista de musicas disponiveis
-        for(int i=0; i<caminhoArq.length; i++){
-            if(caminhoArq[i].getName().endsWith(".wav")){
-                Musica musicas = new Musica(caminhoArq[i].getName(), caminhoArq[i].getPath(), j);
-                this.musicasDisponiveis.put(musicas.getNumero(), musicas);
-                j++;
-            } else System.out.println("Formato nao suportado para " + caminhoArq[i].getName());
-        }
     }
 
     // TO-DO: Colocar quem colocou na fila
 
-    //Mostra as músicas disponíveis para pedir
-    public void mostraMusicas(PrintWriter output){
-        // Imprime a relação de número e música
-        for (ServerThread sT : threadList) sT.output.println("\nMÚSICAS DISPONÍVEIS PARA REPRODUÇÃO - "+ this.musicasDisponiveis.size() +":");
-        for (int j = 1; this.musicasDisponiveis.containsKey(j); j++) {
-            for (ServerThread sT : threadList) sT.output.println(this.musicasDisponiveis.get(j).getNumero() + ": " + this.musicasDisponiveis.get(j).getNome());
+    /**
+     * Imprime as musicas disponiveis no programa
+     * 
+     * @param output
+     */
+    public void mostraMusicas(PrintWriter output) {
+
+        // Para cada thread (usuario ativo) na lista
+        for (ServerCommandThread leitor : leitoresDeComando) {
+
+            // Envia para o cliente o cabecalho e o total de musicas disponiveis
+            leitor.remetenteDeDados
+                    .println("\nMUSICAS DISPONIVEIS PARA REPRODUCAO - " + this.musicasDisponiveis.size() + ":");
         }
-        for (ServerThread sT : threadList) sT.output.println();
+
+        // Para cada musica disponivel e com ID
+        for (int idMusica = 1; this.musicasDisponiveis.containsKey(idMusica); idMusica++) {
+
+            // Para cada thread (usuario ativo) na lista
+            for (ServerCommandThread leitor : leitoresDeComando) {
+
+                // Envia para o cliente o ID da musica e o nome
+                leitor.remetenteDeDados.println(this.musicasDisponiveis.get(idMusica).getNumero() + ": "
+                        + this.musicasDisponiveis.get(idMusica).getNome());
+            }
+        }
+
+        // Para cada thread (usuario ativo) na lista
+        for (ServerCommandThread sT : leitoresDeComando)
+
+            // Envia um espaco
+            sT.remetenteDeDados.println();
     }
 
-    //Mostra as músicas presentes na fila
-    public void mostraFila(PrintWriter output){
+    /**
+     * 
+     * @param output
+     */
+    public void mostraFila(PrintWriter output) {
         // Imprime a relação de número e música
-        if(this.fila.isEmpty()) for (ServerThread sT : threadList) sT.output.println("\n*LISTA DE REPRODUÇÃO VAZIA*\n");
-        else{
+        if (this.fila.isEmpty())
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\n*LISTA DE REPRODUCAO VAZIA*\n");
+        else {
             Iterator<Musica> it = this.fila.iterator();
             int i = 1;
-            for (ServerThread sT : threadList) sT.output.println("LISTA DE REPRODUÇÃO - "+ this.fila.size() +":");
-            while(it.hasNext()){
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("LISTA DE REPRODUCAO - " + this.fila.size() + ":");
+            while (it.hasNext()) {
                 Musica aux = it.next();
-                for (ServerThread sT : threadList) sT.output.println(i + ": " + aux.getNome() + " (" + aux.getNumero() + ")");
+                for (ServerCommandThread sT : leitoresDeComando)
+                    sT.remetenteDeDados.println(i + ": " + aux.getNome() + " (" + aux.getNumero() + ")");
                 i++;
             }
-            for (ServerThread sT : threadList) sT.output.println();
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println();
         }
     }
 
     // Adiciona música no final da fila
-    public void adicionaMusica(PrintWriter output, int num){
+    public void adicionaMusica(PrintWriter output, int num) {
         Musica novaMusica = this.musicasDisponiveis.get(num);
-        if(novaMusica!=null){
+        if (novaMusica != null) {
             this.fila.addLast(novaMusica);
-            for (ServerThread sT : threadList) sT.output.println("\n" + novaMusica.getNome() + " foi adicionado no fim da fila.\n"); 
-        }
-        else{
-            for (ServerThread sT : threadList) sT.output.println("\nNúmero inválido para adição\n"); 
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\n" + novaMusica.getNome() + " foi adicionado no fim da fila.\n");
+        } else {
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\nNumero invalido para adicao\n");
             mostraMusicas(output);
         }
     }
 
     // Remove primeira incidêcia da música
-    public void removeMusica(PrintWriter output, int num){
+    public void removeMusica(PrintWriter output, int num) {
         Musica novaMusica = this.musicasDisponiveis.get(num);
         int index = fila.indexOf(novaMusica);
-        if (novaMusica != null && fila.contains(novaMusica)){
+        if (novaMusica != null && fila.contains(novaMusica)) {
             this.fila.remove(novaMusica);
-            for (ServerThread sT : threadList) sT.output.println("\n" + novaMusica.getNome() + " foi removida no índice " + (index+1) + "\n");
-        }
-        else if(!fila.contains(novaMusica) && musicasDisponiveis.containsValue(novaMusica)){
-            for (ServerThread sT : threadList) sT.output.println("\nMúsica não presente na fila\n");
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados
+                        .println("\n" + novaMusica.getNome() + " foi removida no indice " + (index + 1) + "\n");
+        } else if (!fila.contains(novaMusica) && musicasDisponiveis.containsValue(novaMusica)) {
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\nMusica nao presente na fila\n");
             mostraFila(output);
-        }
-        else{
-            for (ServerThread sT : threadList) sT.output.println("\nNúmero inválido para remoção\n");
+        } else {
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\nNumero invalido para remocao\n");
             mostraMusicas(output);
         }
     }
+
     // Vale a pena fazer um remover por indice
     public void removeMusicaIndex(PrintWriter output, int num) {
-        int index = num-1;
-        if(fila.get(index)!=null){
+        int index = num - 1;
+        if (fila.get(index) != null) {
             Musica novaMusica = this.fila.remove(index);
-            for (ServerThread sT : threadList) sT.output.println("\n" + novaMusica.getNome() + " foi removida na posição " + num + "\n");
-        }
-        else{
-            for (ServerThread sT : threadList){ 
-                sT.output.println("\nÍndice inválido\n");
+            for (ServerCommandThread sT : leitoresDeComando)
+                sT.remetenteDeDados.println("\n" + novaMusica.getNome() + " foi removida na posicao " + num + "\n");
+        } else {
+            for (ServerCommandThread sT : leitoresDeComando) {
+                sT.remetenteDeDados.println("\nIndice invalido\n");
                 mostraFila(output);
             }
         }
     }
 
     // Retorna próxima a musica da fila
-    public void passaMusica(){
+    public void passaMusica() {
         this.fila.removeFirst();
     }
 
-    // Retorna para o inicio da musica 
+    // Retorna para o inicio da musica
     // tocador
-    public void pausaMusica(){
-        
+    public void pausaMusica() {
+
     }
 
-    public void limparFila(PrintWriter output){
+    public void limparFila(PrintWriter output) {
         this.fila.clear();
         mostraFila(output);
     }
-    
-    public Map<Integer, Musica> getMusicasDisponiveis(){
+
+    /**
+     * Cadastra as musicas disponiveis no programa (que sao as da pasta './musicas')
+     */
+    private void cadastraMusicasDisponiveis() {
+
+        // Pega todos os arquivos da pasta './musicas'
+        File[] arquivosMusicas = new File("./musicas").listFiles();
+
+        // Cria um ID incremental para cada musica, comecando de 1
+        int idMusica = 1;
+
+        // Para cada arquvivo na pasta './musicas'
+        for (int i = 0; i < arquivosMusicas.length; i++) {
+
+            // Verifica se o arquivo termina em '.wav'
+            if (arquivosMusicas[i].getName().endsWith(".wav")) {
+
+                // Instancia nova musica com os dados do arquivo e o ID
+                Musica musicas = new Musica(arquivosMusicas[i].getName(), arquivosMusicas[i].getPath(), idMusica);
+
+                // Adiciona a nova musica na lista de musicas disponiveis
+                this.musicasDisponiveis.put(musicas.getNumero(), musicas);
+
+                // Incrementa o ID
+                idMusica++;
+
+                // Caso o arquivo nao termine em './wav' nao eh um arquivo valido para o
+                // programa
+            } else {
+
+                // Imprime erro do arquivo
+                System.out.println("Formato nao suportado para " + arquivosMusicas[i].getName());
+            }
+        }
+    }
+
+    public Map<Integer, Musica> getMusicasDisponiveis() {
         return this.musicasDisponiveis;
     }
 
-    public LinkedList<Musica> getFila(){
+    public LinkedList<Musica> getFila() {
         return this.fila;
     }
-    
+
 }
