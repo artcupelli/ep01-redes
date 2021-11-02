@@ -12,6 +12,10 @@ public class Server {
         this.numActiveClients = 0;
     }
 
+    /**
+     * Inicia o servidor
+     * @throws IOException
+     */
     void liga() throws IOException {
 
         // Abre socket apresentacao
@@ -26,14 +30,15 @@ public class Server {
         // Cria a fila de músicas
         Fila filaDeMusica = new Fila(commandThreadList);
 
-
+        // Loop infinito do server
         while (true) {
 
             // Aceita conexão
             Socket socketConexao = socketApresentacao.accept();
 
             // Inicia thread de ler comando
-            ServerCommandThread serverCommandThread = new ServerCommandThread(socketConexao, commandThreadList, menu, filaDeMusica, this);
+            ServerCommandThread serverCommandThread = new ServerCommandThread(socketConexao, commandThreadList, menu,
+                    filaDeMusica, this);
             commandThreadList.add(serverCommandThread);
             serverCommandThread.start();
 
@@ -43,8 +48,14 @@ public class Server {
         }
     }
 
+    /**
+     * Adiciona cliente na lista de clientes ativos
+     * @param enderecoIP
+     * @param nome
+     * @param porta
+     */
     public void adicionaCliente(InetAddress enderecoIP, String nome, int porta) {
-        
+
         // Soma no número de clientes ativos
         this.numActiveClients++;
 
@@ -64,7 +75,4 @@ public class Server {
 
     }
 
-    
-
 }
-
