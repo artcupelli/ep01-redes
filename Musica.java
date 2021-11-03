@@ -1,8 +1,11 @@
+/**
+ * Classe que guarda as informacoes de uma musica
+ */
 public class Musica {
 
-    private String nome;
-    private String caminho;
-    private int numero;
+    private String nome;        // Nome do arquivo na pasta
+    private String caminho;     // Caminho no diretorio
+    private int numero;         // ID da musica (dado por ordem de leitura)
     
     public Musica(String nome, String caminho, int numero){
         this.nome = nome.replace(".wav","");

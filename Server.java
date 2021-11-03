@@ -3,13 +3,17 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
+/**
+ * Classe que instancia o Servidor, recebe os clientes e incia a comunicacao
+ */
 public class Server {
-    Map<Integer, ClientInfo> activeClients;
-    Menu menu;
-    Fila filaDeMusica;
+
+    Map<Integer, ClientInfo> clientesAtivos;    // Clientes conectados
+    Menu menu;                                  // Menu com os comandos
+    Fila filaDeMusica;                          // Fila com as musicas que os clientes escolheram
 
     public Server() {
-        this.activeClients = new HashMap<Integer, ClientInfo>();
+        this.clientesAtivos = new HashMap<Integer, ClientInfo>();
     }
 
     /**
@@ -70,17 +74,20 @@ public class Server {
         ClientInfo cliente = new ClientInfo(enderecoIP, nome, porta, socketComando, socketMusica);
 
         // Adiciona o cliente no Map de clientes ativos
-        this.activeClients.put(porta, cliente);
+        this.clientesAtivos.put(porta, cliente);
 
         // Imprime os clientes conectados
         this.imprimeClientes();
 
     }
 
+    /**
+     * Imprime todos os clientes ativos
+     */
     public void imprimeClientes() {
         // Imprime os clientes conectados
-        System.out.println("CLIENTES CONECTADOS (" + this.activeClients.size()+ ")");
-        this.activeClients.forEach((id, cli) -> System.out.println(id + " | " + cli.nome + " | " + cli.enderecoIP));
+        System.out.println("CLIENTES CONECTADOS (" + this.clientesAtivos.size()+ ")");
+        this.clientesAtivos.forEach((id, cli) -> System.out.println(id + " | " + cli.nome + " | " + cli.enderecoIP));
         System.out.println("\n");
     }
 

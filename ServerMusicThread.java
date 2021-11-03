@@ -8,10 +8,8 @@ import java.util.Map;
  */
 public class ServerMusicThread extends Thread {
 
-    public ServerSocket socketApresentacao;
-    public DatagramSocket socket;
-    public Server server;
-    public Fila fila;
+    public Server server;   // Instancia do servidor ativo
+    public Fila fila;       // Fila de musicas
 
     public ServerMusicThread(Server server) throws UnknownHostException, IOException {
         this.server = server;
@@ -62,7 +60,7 @@ public class ServerMusicThread extends Thread {
                     while ((count = arquivoMusica.read(buffer)) != -1) {
 
                         // Para todos os clientes ativos
-                        for (ClientInfo client : this.server.activeClients.values()) {
+                        for (ClientInfo client : this.server.clientesAtivos.values()) {
 
                             // Troca o remetente para o do cliente atual
                             remetenteDeDados = client.socketMusica.getOutputStream();
@@ -73,7 +71,7 @@ public class ServerMusicThread extends Thread {
 
                     }
 
-                    for (ClientInfo client : this.server.activeClients.values()) {
+                    for (ClientInfo client : this.server.clientesAtivos.values()) {
                         remetenteDeDados = client.socketMusica.getOutputStream();
 
                         // Retira a musica da fila
@@ -84,11 +82,8 @@ public class ServerMusicThread extends Thread {
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
     }

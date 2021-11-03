@@ -11,12 +11,12 @@ import java.util.ArrayList;
  * Implementa a thread para recebimento dos comandos do cliente
  */
 public class ServerCommandThread extends Thread {
-	private Server server;
-	private ArrayList<ServerCommandThread> threadList;
-	public PrintWriter remetenteDeDados;
-	private BufferedReader leitorDeDados;
-	private Socket socketComando;
-	private Socket socketMusica;
+	private Server server;									// Instancia do servidor ativo
+	private ArrayList<ServerCommandThread> threadList;		// Pega lista de threads dos sockets de envio/recebimento de comando
+	public PrintWriter remetenteDeDados;					// Le os dados do cliente
+	private BufferedReader leitorDeDados;					// Envia os dados para o cliente
+	private Socket socketComando;							// Socket de envio/recebimento de comandos
+	private Socket socketMusica;							// Socket de envio de musica
 
 
 	public ServerCommandThread(ArrayList<ServerCommandThread> threads, Server server, Socket socketComando, Socket socketMusica) throws IOException {
@@ -46,7 +46,7 @@ public class ServerCommandThread extends Thread {
 
 			String outputString;
 
-			// inifite loop for server
+			// Loop infinito do servidor
 			while (true) {
 				try{
 					// Pega proximo comando do cliente
@@ -54,23 +54,27 @@ public class ServerCommandThread extends Thread {
 
 				}catch(IOException e){
 					
-					// Caso dê erro (desconexao do cliente)
+					// Caso de erro, desconecta o cliente
 					System.out.println("\nCliente " + nomeDoCliente + " se desconectou\n"); 
-					this.server.activeClients.remove(portaDoCliente);
+					this.server.clientesAtivos.remove(portaDoCliente);
 					this.server.imprimeClientes();
 					break;
 				}
 
-				// if user types exit command
-				if (outputString.equals("exit")) {
+				// Se o cliente digitar 'sair', terminar a thread
+				if (outputString.equals("sair")) {
 					break;
 				}
 
+				// Envia comando para o menu interpretar
 				if (!outputString.contains(") "))
 					this.server.menu.menuComandos(outputString, this.server.filaDeMusica, this.remetenteDeDados);
+				
+				// Envia comando recebido para todos os clientes
 				else
-					printToALlClients(outputString);
-				// output.println("Server says " + outputString);
+					this.imprimirParaTodosClientes(outputString);
+
+				// Imprime o comando recebido no terminal do servidor
 				if (outputString.contains(") "))
 					System.out.println("Server recebeu " + outputString);
 				else
@@ -83,8 +87,16 @@ public class ServerCommandThread extends Thread {
 		}
 	}
 
-	private void printToALlClients(String outputString) {
+	/**
+	 * Envia uma mensagem para todos os clientes ativos
+	 * @param outputString
+	 */
+	private void imprimirParaTodosClientes(String outputString) {
+
+		// Para cada thread de envio/recebimento de comandos
 		for (ServerCommandThread sT : threadList) {
+
+			// Imprimir a mensagem
 			sT.remetenteDeDados.println(outputString);
 		}
 	}

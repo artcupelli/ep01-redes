@@ -5,62 +5,81 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class Client{
+public class Client {
 
     public Client() {
     }
 
+    /**
+     * Conecta novo cliente com o servidor
+     * 
+     * @throws UnknownHostException
+     * @throws IOException
+     */
     public void conectaComServidor() throws UnknownHostException, IOException {
 
         // Conecta com socket TCP (responsavel por receber os comandos)
         Socket socket = new Socket(InetAddress.getLocalHost(), 6264);
 
-        // Retornando o output para o server
+        // Cria output para o server
         PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 
-        // Pegando a entrada do usuario
+        // Pega a entrada do usuario
         Scanner scanner = new Scanner(System.in);
 
         // Armazena entrada do usuario e seu nome
-        String userInput, clientName = "empty";
+        String entradaUsuario, clientName = "vazio";
 
-        // Cria thread para recepção da música 
+        // Cria thread para recepção da música
         ClientMusicRunnable clientMusicRunnable = new ClientMusicRunnable();
         new Thread(clientMusicRunnable).start();
-        
-        // Cria thread para envio dos comandos 
+
+        // Cria thread para envio dos comandos
         ClientCommandRunnable clientCommandRunnable = new ClientCommandRunnable(socket);
         new Thread(clientCommandRunnable).start();
 
-
-        // loop closes when user enters sair command
+        // Enquanto o usuario nao digitar 'sair' continua pegando os comandos
         do {
 
-            if (clientName.equals("empty")) {
+            // Se o usuario ainda nao inseriu um nome
+            if (clientName.equals("vazio")) {
+
+                // Solicita o nome
                 System.out.print("\nColoque seu nome: ");
-                userInput = scanner.nextLine();
-                clientName = userInput;
-                output.println(userInput);
-                // this.apelido = userInput;
-                // output.println(userInput);
-                if (userInput.toLowerCase().trim().equals("sair")) {
+                entradaUsuario = scanner.nextLine();
+                clientName = entradaUsuario;
+                output.println(entradaUsuario);
+
+                // Se digitar 'sair' termina a aplicacao
+                if (entradaUsuario.toLowerCase().trim().equals("sair")) {
                     socket.close();
                     break;
                 }
+
+                // Caso contrario (ja tem nome)
             } else {
-                String message = ("(" + clientName + ")" + " message: ");
-                System.out.println(message);
-                userInput = scanner.nextLine();
-                output.println("(" + clientName + ") " + userInput);
-                output.println(userInput);
-                if (userInput.equals("sair")) {
-                    // reading the input from server
+
+                // Imprime cabecalho da mensagem
+                System.out.println("(" + clientName + ")" + " mensagem: ");
+
+                // Pega proximo comando
+                entradaUsuario = scanner.nextLine();
+
+                // Imprime comando para no servidor
+                output.println("(" + clientName + ") " + entradaUsuario);
+
+                // Manda comando para o servidor
+                output.println(entradaUsuario);
+
+                // Se o comando for 'sair', fechar tudo
+                if (entradaUsuario.equals("sair")) {
                     socket.close();
+                    scanner.close();
                     break;
                 }
             }
 
-        } while (!userInput.equals("sair"));
+        } while (!entradaUsuario.equals("sair"));
 
     }
 

@@ -7,7 +7,8 @@ import javax.sound.sampled.*;
  * Implementa thread para recebimento da musica enviada pelo servidor
  */
 public class ClientMusicRunnable implements Runnable {
-    private Socket socket;
+
+    private Socket socket;      // Socket que recebe a musica
 
     public ClientMusicRunnable() throws UnknownHostException, IOException {
 
@@ -33,15 +34,23 @@ public class ClientMusicRunnable implements Runnable {
             }
 
         } catch (IOException e) {
+
+            // Caso se desconecte termina o programa
+            System.exit(0);
             return;
+            
         } catch (Exception e) {
+            
+            // Caso se desconecte termina o programa
+            System.exit(0);
             return;
         }
 
     }
 
     /**
-     * Toca musica dado um InputStream
+     * Toca musica dado um InputStream 
+     * (neste caso, recebido do servidor)
      * 
      * @param in
      * @throws Exception

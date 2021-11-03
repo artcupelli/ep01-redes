@@ -58,7 +58,7 @@ public class Menu {
      * 
      * @param output
      */
-    private void showComandos(PrintWriter output) {
+    private void mostraComandos(PrintWriter output) {
 
         // Imprime os comandos
         output.println("COMANDOS: ");
@@ -125,7 +125,7 @@ public class Menu {
 
         // Caso 'comandos': Mostra a lista de comandos reconhecidos pelo programa
         case "comandos":
-            showComandos(output);
+            mostraComandos(output);
             break;
 
         // Caso 'sair': Desconecta o cliente
@@ -136,7 +136,7 @@ public class Menu {
         // Caso contrario: Espera outro comando, exibe a lista de comandos
         default:
             output.println("\nCOMANDO INVALIDO, ESCOLHA ENTRE ESSES:\n");
-            showComandos(output);
+            mostraComandos(output);
             break;
         }
 

@@ -21,8 +21,6 @@ public class Fila {
 
     }
 
-    // TO-DO: Colocar quem colocou na fila
-
     /**
      * Imprime as musicas disponiveis no programa
      * 
@@ -58,90 +56,200 @@ public class Fila {
     }
 
     /**
+     * Imprime a fila de reproducao para o cliente
      * 
      * @param output
      */
     public void mostraFila(PrintWriter output) {
-        // Imprime a relação de número e música
-        if (this.fila.isEmpty())
-            for (ServerCommandThread sT : leitoresDeComando)
+
+        // Se a fila estiver vazia
+        if (this.fila.isEmpty()) {
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem de erro
                 sT.remetenteDeDados.println("\n*LISTA DE REPRODUCAO VAZIA*\n");
+            }
+        }
+
+        // Se a fila nao estiver vazia
         else {
+
+            // Itera pela fila
             Iterator<Musica> it = this.fila.iterator();
             int i = 1;
-            for (ServerCommandThread sT : leitoresDeComando)
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Imprime cabecalho
                 sT.remetenteDeDados.println("\nLISTA DE REPRODUCAO - " + this.fila.size() + ":");
+            }
+
+            // Enquanto ha musicas na fila
             while (it.hasNext()) {
+
+                // Pega musica
                 Musica aux = it.next();
+
+                // Para cada thread de envio/recebimento de comando
                 for (ServerCommandThread sT : leitoresDeComando)
+
+                    // Imprime musica
                     sT.remetenteDeDados.println(i + ": " + aux.getNome() + " (" + aux.getNumero() + ")");
                 i++;
             }
+
+            // Para cada thread de envio/recebimento de comando imprime um espaco
             for (ServerCommandThread sT : leitoresDeComando)
                 sT.remetenteDeDados.println();
         }
     }
 
-    // Adiciona música no final da fila
+    /**
+     * Adiciona musica na fila
+     * 
+     * @param output
+     * @param num
+     */
     public void adicionaMusica(PrintWriter output, int num) {
+
+        // Pega a musica do acervo
         Musica novaMusica = this.musicasDisponiveis.get(num);
+
+        // Se a musica existir
         if (novaMusica != null) {
+
+            // Adiciona musica na fila
             this.fila.addLast(novaMusica);
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("\n" + novaMusica.getNome() + " foi adicionado no fim da fila.\n");
-        } else {
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("\nNumero invalido para adicao\n");
-            mostraMusicas(output);
-        }
-    }
 
-    // Remove primeira incidêcia da música
-    public void removeMusica(PrintWriter output, int num) {
-        Musica novaMusica = this.musicasDisponiveis.get(num);
-        int index = fila.indexOf(novaMusica);
-        if (novaMusica != null && fila.contains(novaMusica)) {
-            this.fila.remove(novaMusica);
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados
-                        .println("\n" + novaMusica.getNome() + " foi removida no indice " + (index + 1) + "\n");
-        } else if (!fila.contains(novaMusica) && musicasDisponiveis.containsValue(novaMusica)) {
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("\nMusica nao presente na fila\n");
-            mostraFila(output);
-        } else {
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("\nNumero invalido para remocao\n");
-            mostraMusicas(output);
-        }
-    }
-
-    // Vale a pena fazer um remover por indice
-    public void removeMusicaIndex(PrintWriter output, int num) {
-        int index = num - 1;
-        if (fila.get(index) != null) {
-            Musica novaMusica = this.fila.remove(index);
-            for (ServerCommandThread sT : leitoresDeComando)
-                sT.remetenteDeDados.println("\n" + novaMusica.getNome() + " foi removida na posicao " + num + "\n");
-        } else {
+            // Para cada thread de envio/recebimento de comando
             for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem
+                sT.remetenteDeDados.println("\n" + novaMusica.getNome() + " foi adicionado no fim da fila.\n");
+            }
+        }
+
+        // Se a musica nao existir
+        else {
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem de erro
+                sT.remetenteDeDados.println("\nNumero invalido para adicao\n");
+            }
+
+            // Mostra as musicas disponiveis
+            mostraMusicas(output);
+        }
+    }
+
+    /**
+     * Remove da fila a primeira incidencia da musica com ID = num
+     * 
+     * @param output
+     * @param num
+     */
+    public void removeMusica(PrintWriter output, int num) {
+
+        // Procura musica com ID = num
+        Musica musica = this.musicasDisponiveis.get(num);
+
+        // Pega o index da musica
+        int index = fila.indexOf(musica);
+
+        // Se houver musica com o ID selecionado
+        if (musica != null && fila.contains(musica)) {
+
+            // Tira musica da fila
+            this.fila.remove(musica);
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando)
+
+                // Envia mensagem
+                sT.remetenteDeDados.println("\n" + musica.getNome() + " foi removida no indice " + (index + 1) + "\n");
+
+        }
+
+        // Caso contrario, se a musica nao estiver na fila mas existir
+        else if (!fila.contains(musica) && musicasDisponiveis.containsValue(musica)) {
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem de erro
+                sT.remetenteDeDados.println("\nMusica nao presente na fila\n");
+            }
+
+            // Mostra fila novamente para o cliente
+            mostraFila(output);
+
+        }
+
+        // Caso contrario (nao existe esta musica)
+        else {
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem de erro
+                sT.remetenteDeDados.println("\nNumero invalido para remocao\n");
+
+            }
+
+            // Mostra musicas disponiveis para o cliente
+            mostraMusicas(output);
+        }
+    }
+
+    /**
+     * Remove a fila a musica na posicao (index) = num
+     * 
+     * @param output
+     * @param num
+     */
+    public void removeMusicaIndex(PrintWriter output, int num) {
+
+        // Pega index verdadeiro
+        int index = num - 1;
+
+        // Se tem musica no index
+        if (fila.get(index) != null) {
+
+            // Remove musica da fila
+            Musica musicaRemovida = this.fila.remove(index);
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem
+                sT.remetenteDeDados.println("\n" + musicaRemovida.getNome() + " foi removida na posicao " + num + "\n");
+            }
+
+        }
+
+        // Se nao tiver musica no index
+        else {
+
+            // Para cada thread de envio/recebimento de comando
+            for (ServerCommandThread sT : leitoresDeComando) {
+
+                // Envia mensagem de erro
                 sT.remetenteDeDados.println("\nIndice invalido\n");
+
+                // Mostra a fila novamente
                 mostraFila(output);
             }
         }
     }
 
-    // Retorna próxima a musica da fila
-    public void passaMusica() {
-        this.fila.removeFirst();
-    }
-
-    // Retorna para o inicio da musica
-    // tocador
-    public void pausaMusica() {
-
-    }
-
+    /**
+     * Limpa fila de reproducao
+     */
     public void limparFila(PrintWriter output) {
         this.fila.clear();
         mostraFila(output);
