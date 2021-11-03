@@ -61,7 +61,10 @@ public class ServerMusicThread extends Thread {
                     // Enquanto houver bytes a serem lidos
                     while ((count = arquivoMusica.read(buffer)) != -1) {
 
+                        // Para todos os clientes ativos
                         for (ClientInfo client : this.server.activeClients.values()) {
+
+                            // Troca o remetente para o do cliente atual
                             remetenteDeDados = client.socketMusica.getOutputStream();
 
                             // Envia os dados dentro do intervalo estabelecido
