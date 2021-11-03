@@ -63,8 +63,6 @@ public class Menu {
         // Imprime os comandos
         output.println("COMANDOS: ");
         output.println("---------------");
-        output.println("  play:                 Reproduz a musica");
-        output.println("  pause:                Pausa a musica");
         output.println(
                 "  add <num>:            Adiciona musica correpondente ao numero no final da lista de reproducao");
         output.println(
