@@ -12,26 +12,24 @@ import java.util.ArrayList;
  */
 public class ServerCommandThread extends Thread {
 	private Server server;
-	private Socket socket;
 	private ArrayList<ServerCommandThread> threadList;
-	private Menu menu;
-	private Fila fila;
 	public PrintWriter remetenteDeDados;
 	private BufferedReader leitorDeDados;
+	private Socket socketComando;
+	private Socket socketMusica;
 
-	public ServerCommandThread(Socket socket, ArrayList<ServerCommandThread> threads, Menu menu, Fila fila,
-			Server server) throws IOException {
+
+	public ServerCommandThread(ArrayList<ServerCommandThread> threads, Server server, Socket socketComando, Socket socketMusica) throws IOException {
 		this.server = server;
-		this.socket = socket;
 		this.threadList = threads;
-		this.menu = menu;
-		this.fila = fila;
+		this.socketComando = socketComando;
+		this.socketMusica = socketMusica;
 
 		// Le os dados enviados pelo cliente
-		this.leitorDeDados = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		this.leitorDeDados = new BufferedReader(new InputStreamReader(this.socketComando.getInputStream()));
 
 		// Instancia um PrintWriter com o outputStream do cliente para retornar dados
-		this.remetenteDeDados = new PrintWriter(socket.getOutputStream(), true);
+		this.remetenteDeDados = new PrintWriter(this.socketComando.getOutputStream(), true);
 	}
 
 	@Override
@@ -40,23 +38,36 @@ public class ServerCommandThread extends Thread {
 
 			// Pega nome, IP e porta do cliente
 			String nomeDoCliente = this.leitorDeDados.readLine();
-			InetAddress enderecoIPdoCliente = this.socket.getInetAddress();
-			int portaDoCliente = this.socket.getPort();
+			InetAddress enderecoIPdoCliente = this.socketComando.getInetAddress();
+			int portaDoCliente = this.socketComando.getPort();
 
 			// Adiciona cliente na lista de ativos do servidor
-			this.server.adicionaCliente(enderecoIPdoCliente, nomeDoCliente, portaDoCliente);
+			this.server.adicionaCliente(enderecoIPdoCliente, nomeDoCliente, portaDoCliente, this.socketComando, this.socketMusica);
 
+			String outputString;
 
 			// inifite loop for server
 			while (true) {
-				String outputString = this.leitorDeDados.readLine();
+				try{
+					// Pega proximo comando do cliente
+					outputString = this.leitorDeDados.readLine();
+
+				}catch(IOException e){
+					
+					// Caso dê erro (desconexao do cliente)
+					System.out.println("\nCliente " + nomeDoCliente + " se desconectou\n"); 
+					this.server.activeClients.remove(portaDoCliente);
+					this.server.imprimeClientes();
+					break;
+				}
+
 				// if user types exit command
 				if (outputString.equals("exit")) {
 					break;
 				}
 
 				if (!outputString.contains(") "))
-					menu.menuComandos(outputString, fila, this.remetenteDeDados);
+					this.server.menu.menuComandos(outputString, this.server.filaDeMusica, this.remetenteDeDados);
 				else
 					printToALlClients(outputString);
 				// output.println("Server says " + outputString);
@@ -68,7 +79,7 @@ public class ServerCommandThread extends Thread {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error occured " + e.getStackTrace());
+			e.printStackTrace();
 		}
 	}
 

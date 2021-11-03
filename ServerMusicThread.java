@@ -10,14 +10,12 @@ public class ServerMusicThread extends Thread {
 
     public ServerSocket socketApresentacao;
     public DatagramSocket socket;
+    public Server server;
     public Fila fila;
-    public Socket socketConexao;
 
-    public ServerMusicThread(Fila fila) throws UnknownHostException, IOException {
-        this.fila = fila;
-
-        // Cria o socket de apresentação
-        this.socketApresentacao = new ServerSocket(6364);
+    public ServerMusicThread(Server server) throws UnknownHostException, IOException {
+        this.server = server;
+        this.fila = server.filaDeMusica;
 
     }
 
@@ -25,16 +23,14 @@ public class ServerMusicThread extends Thread {
     public void run() {
         try {
 
-            // Aceita um cliente novo
-            this.socketConexao = socketApresentacao.accept();
-
             // Cria o outputStream para enviar dados
-            OutputStream remetenteDeDados = socketConexao.getOutputStream();
+            OutputStream remetenteDeDados;
 
             // Loop infinito do server
             while (true) {
 
-                // Inativa esta thread por 100ms para ter certeza que a thread de comandos iniciou primeiro
+                // Inativa esta thread por 100ms para ter certeza que a thread de comandos
+                // iniciou primeiro
                 Thread.sleep(100);
 
                 // Enquanto se a fila de musicas nao esta vazia
@@ -43,7 +39,8 @@ public class ServerMusicThread extends Thread {
                     // Pega a primeira musica da fila
                     Musica musica = this.fila.getFila().getFirst();
 
-                    // Pega o arquivo da musica na memoria em seu caminho (ex: 'C:/musicas/teste.wav')
+                    // Pega o arquivo da musica na memoria em seu caminho (ex:
+                    // 'C:/musicas/teste.wav')
                     FileInputStream arquivoMusica = new FileInputStream(new File(musica.getCaminho()));
 
                     // Cria um buffer para enviar a musica 'n' bytes por vez
@@ -64,12 +61,21 @@ public class ServerMusicThread extends Thread {
                     // Enquanto houver bytes a serem lidos
                     while ((count = arquivoMusica.read(buffer)) != -1) {
 
-                        // Envia os dados dentro do intervalo estabelecido
-                        remetenteDeDados.write(buffer, offset, count);
+                        for (ClientInfo client : this.server.activeClients.values()) {
+                            remetenteDeDados = client.socketMusica.getOutputStream();
+
+                            // Envia os dados dentro do intervalo estabelecido
+                            remetenteDeDados.write(buffer, offset, count);
+                        }
+
                     }
 
-                    // Retira a musica da fila
-                    this.fila.removeMusica(new PrintWriter(remetenteDeDados, true), musica.getNumero());
+                    for (ClientInfo client : this.server.activeClients.values()) {
+                        remetenteDeDados = client.socketMusica.getOutputStream();
+
+                        // Retira a musica da fila
+                        this.fila.removeMusica(new PrintWriter(remetenteDeDados, true), musica.getNumero());
+                    }
 
                 }
             }

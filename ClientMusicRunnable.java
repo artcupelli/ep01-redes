@@ -33,9 +33,9 @@ public class ClientMusicRunnable implements Runnable {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            return;
         } catch (Exception e) {
-            e.printStackTrace();
+            return;
         }
 
     }
@@ -49,10 +49,10 @@ public class ClientMusicRunnable implements Runnable {
     private static synchronized void tocaMusica(final InputStream leitorDeDados, final OutputStream remententeDeDados)
             throws Exception {
 
-        // Implementa o leitor de dados genérico como um leitor especifico de audio
-        AudioInputStream leitorDeAudio = AudioSystem.getAudioInputStream(leitorDeDados);
-
         try {
+
+            // Implementa o leitor de dados genérico como um leitor especifico de audio
+            AudioInputStream leitorDeAudio = AudioSystem.getAudioInputStream(leitorDeDados);
 
             // Instancia a classe Clip que consegue tocar o audio de um arquivo
             // pre-conhecido
@@ -64,13 +64,13 @@ public class ClientMusicRunnable implements Runnable {
 
             // Comeca a tocar o clipe
             clip.start();
-            
+
             // Espera 100ms e limpa os dados do buffer
             Thread.sleep(100);
             clip.drain();
 
         } catch (Exception e) {
-            System.out.println(e);
+            return;
         }
     }
 

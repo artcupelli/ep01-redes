@@ -16,20 +16,18 @@ public class ClientCommandRunnable implements Runnable {
 	@Override
 	public void run() {
 
-		try {
-			while (true) {
+		while (true) {
+			try{
 				String response = input.readLine();
 				System.out.println(response);
+			}catch(IOException e){
+				System.out.println("\nServidor foi desconectado :c\n");
+				break;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				input.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
 		}
+
+
 	}
 
 }
