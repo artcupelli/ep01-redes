@@ -1,4 +1,15 @@
 
+/**
+
+    EP01 - REDES - STREAMING DE MÚSICA
+
+    Artur Egidio Launikas e Cupelli 11795738
+    Idemar Burssed dos Santos Neto 11857282
+    Milleny Caroliny de Almeida Santos 11937979
+    Raquel Cristiane da Silva Almeida 11838245 
+ 
+ */
+
 import java.io.*;
 import java.net.*;
 import java.util.Map;
@@ -8,8 +19,8 @@ import java.util.Map;
  */
 public class ServerMusicThread extends Thread {
 
-    public Server server;   // Instancia do servidor ativo
-    public Fila fila;       // Fila de musicas
+    public Server server; // Instancia do servidor ativo
+    public Fila fila; // Fila de musicas
 
     public ServerMusicThread(Server server) throws UnknownHostException, IOException {
         this.server = server;
